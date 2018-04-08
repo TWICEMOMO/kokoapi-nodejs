@@ -1,21 +1,19 @@
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var router = express.Router();
-var Client = require('node-rest-client').Client;
-var client = new Client();
-var request = require('request');
-var urlencode = require('urlencode');
-var paresString = require('xml2js').parseString;
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+const router = express.Router();
+const Client = require('node-rest-client').Client;
+const client = new Client();
+const request = require('request');
+const urlencode = require('urlencode');
+const paresString = require('xml2js').parseString;
+const calc = require('./tool/mapCalc.js');
 
+let jd;
+let wurl;
+let answer;
+let ans;
 
-
-var jd;
-var wurl;
-var answer;
-var ans;
-
-var calc = require('./tool/mapCalc.js');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
@@ -27,6 +25,30 @@ app.get('/keyboard', function(req, res) {
   }
   res.send(keyboard);
 });
+
+app.post('/message', function(req, res) {
+  const _obj = {
+    user_key: req.body.user_key,
+    type: req.body.type,
+    content: req.body.content
+  };
+  var city = urlencode(_obj.content);
+  var url = 'https://maps.google.com/maps/api/geocode/json?address='+city+'&key=APIkey';
+  A(url)
+  .then((data)=> B(data.result))
+  .then((data)=> {
+    console.log(data);
+    answer = {
+      "message": {
+        "text": ans
+      }
+    }
+    console.log('온도에요'+ans);
+    res.send(answer);
+  });
+  return;
+});
+
 let A = (url) => new Promise((resolve)=>{
   console.log('A Executed');
   request({
@@ -71,33 +93,6 @@ let B = (wurl)=>new Promise((resolve)=>{
     resolve({result:ans});
   },500);
 });
-
-
-app.post('/message', function(req, res) {
-  const _obj = {
-    user_key: req.body.user_key,
-    type: req.body.type,
-    content: req.body.content
-  };
-  var city = urlencode(_obj.content);
-  var url = 'https://maps.google.com/maps/api/geocode/json?address='+city+'&key='+'Apikey';
-
-  A(url)
-  .then((data)=> B(data.result))
-  .then((data)=> {
-    console.log(data);
-
-    answer = {
-      "message": {
-        "text": ans
-      }
-    }
-    console.log('온도에요'+ans);
-    res.send(answer);
-  });
-  return;
-});
-
 
 app.listen(3000, function() {
   console.log('Connect 3000 port!');
