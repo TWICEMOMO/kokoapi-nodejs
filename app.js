@@ -37,6 +37,7 @@ app.post('/message', function(req, res) {
   if(_obj.content=='독도') arr[4]='독도는 대한민국 땅입니다.\n';
   else arr[4]=_obj.content+'를 찾을 수 없습니다\n';
   var city = urlencode(_obj.content);
+
   var url = 'https://maps.google.com/maps/api/geocode/json?address='+city+'&key=APIkey';
   A(url)
   .then(data=> B(data.result))
@@ -77,7 +78,7 @@ let A = (url) => new Promise((resolve, reject)=>{
             console.log(Xpos);
             console.log(Ypos);
             wurl = 'http://www.kma.go.kr/wid/queryDFS.jsp?gridx=' + Xpos + '&gridy=' + Ypos;
-            arr[3]=jd.results[0].formatted_address.substring(5,jd.results[0].formatted_address.length);
+            arr[3]=jd.results[0].formatted_address.substring(5,jd.results[0].formatted_address.length)+'\n';
             break;
           }
           else whe=-1;
@@ -102,9 +103,9 @@ let B = (wurl)=>new Promise((resolve)=>{
       data = JSON.stringify(result);
       data = JSON.parse(data);
     })
-    arr[0] = '\n ~ '+(data.wid.body[0].data[0].hour*1)%24+'시 예보\n날씨 : '+ data.wid.body[0].data[0].wfKor+'\n온도 : '+data.wid.body[0].data[0].temp+'℃\n강수확률 : '+data.wid.body[0].data[0].pop+'%\n\n';
-    arr[1] = (data.wid.body[0].data[0].hour*1)%24+' ~ '+(data.wid.body[0].data[1].hour*1)%24+'시 예보\n날씨 : '+ data.wid.body[0].data[1].wfKor+'\n온도 : '+data.wid.body[0].data[1].temp+'℃\n강수확률 : '+data.wid.body[0].data[0].pop+'%\n\n';
-    arr[2] = (data.wid.body[0].data[1].hour*1)%24+' ~ '+(data.wid.body[0].data[2].hour*1)%24+'시 예보\n날씨 : '+ data.wid.body[0].data[2].wfKor+'\n온도 : '+data.wid.body[0].data[2].temp+'℃\n강수확률 : '+data.wid.body[0].data[0].pop+'%';
+    arr[0] = '\n ~ '+(data.wid.body[0].data[0].hour*1)%24+'시 예보\n날씨 : '+ data.wid.body[0].data[0].wfKor+'\n기온 : '+data.wid.body[0].data[0].temp+'℃\n습도 : '+data.wid.body[0].data[0].reh+'%\n강수확률 : '+data.wid.body[0].data[0].pop+'%\n\n';
+    arr[1] = (data.wid.body[0].data[0].hour*1)%24+' ~ '+(data.wid.body[0].data[1].hour*1)%24+'시 예보\n날씨 : '+ data.wid.body[0].data[1].wfKor+'\n기온 : '+data.wid.body[0].data[1].temp + '℃\n습도 : '+data.wid.body[0].data[1].reh+'%\n강수확률 : '+data.wid.body[0].data[1].pop+'%\n\n';
+    arr[2] = (data.wid.body[0].data[1].hour*1)%24+' ~ '+(data.wid.body[0].data[2].hour*1)%24+'시 예보\n날씨 : '+ data.wid.body[0].data[2].wfKor+'\n기온 : '+data.wid.body[0].data[2].temp+ '℃\n습도 : '+data.wid.body[0].data[2].reh+'%\n강수확률 : '+data.wid.body[0].data[2].pop+'%';
     ans=arr[3]+arr[0]+arr[1]+arr[2];
   });
   setTimeout(()=>{
