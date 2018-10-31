@@ -5,7 +5,7 @@
 - [Node.js](https://nodejs.org/ko/ "Node.js")
 
 ## Uses
-- [Google Maps Geocoding API](https://developers.google.com/maps/documentation/javascript/geocoding?hl=ko "Google Maps Geocoding API")
+- [NAVER Maps API](https://navermaps.github.io/maps.js/docs/index.html)
 - [기상청 API](http://www.weather.go.kr/weather/lifenindustry/sevice_rss.jsp "기상청 API")
 
 ## 사용법
@@ -14,12 +14,17 @@
 3. 에러 및 문제 깃헙이나 날씨를알려줄게 상담원에게 문의해주세요.
 
 ## version
-ver.1.0.0
+ver.1.0.0  
 서비스 시작
 
-ver.1.1.0
-강수확률 오류 수정
+ver.1.1.0  
+강수확률 오류 수정   
 습도 추가
 
-ver 1.1.1
-내부 패키 보안이슈로 최신버전 업데이트
+ver 1.1.1  
+내부 패키지 보안이슈로 최신버전 업데이트
+
+ver 1.2.0  
+맵 API 변경  
+(전 [Gdogle Maps Geocoding API](https://developers.google.com/maps/documentation/javascript/geocoding?hl=ko "Google Maps Geocoding API") )
+(후 [NAVER Maps API](https://navermaps.github.io/maps.js/docs/index.html))

@@ -9,12 +9,16 @@ const urlencode = require('urlencode');
 const paresString = require('xml2js').parseString;
 const calc = require('./tool/mapCalc.js');
 
+const client_id = naver_user_api_id;
+const client_secret = naver_user_secret_id;
+
 let jd;
 let wurl;
 let answer;
 let ans;
 let whe;
-const arr=[];
+let arr=[];
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
@@ -27,18 +31,35 @@ app.get('/keyboard', function(req, res) {
   res.send(keyboard);
 });
 
+app.get('/geocode', function (req, res) {
+  var api_url = 'https://openapi.naver.com/v1/map/geocode?query=' + encodeURI(req.query.query); // json
+  //var api_url = 'https://openapi.naver.com/v1/map/geocode.xml?query=' + encodeURI(req.query.query); // xml
+  var request = require('request');
+  var options = {
+    url: api_url,
+    headers: {'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret': client_secret}
+  };
+  request.get(options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      res.writeHead(200, {'Content-Type': 'text/json;charset=utf-8'});
+      res.end(body);
+    } else {
+      res.status(response.statusCode).end();
+      console.log('error = ' + response.statusCode);
+      }
+    });
+});
+
 app.post('/message', function(req, res) {
   const _obj = {
     user_key: req.body.user_key,
     type: req.body.type,
     content: req.body.content
   };
-  console.log(_obj.content);
-  if(_obj.content=='독도') arr[4]='독도는 대한민국 땅입니다.\n';
-  else arr[4]=_obj.content+'를 찾을 수 없습니다\n';
   var city = urlencode(_obj.content);
+  arr[4]=_obj.content+'를 찾을수 없습니다. \n다시검색해주세요';
+  var url = 'http://serverip:host/geocode?query='+city;
 
-  var url = 'https://maps.google.com/maps/api/geocode/json?address='+city+'&key=APIkey';
   A(url)
   .then(data=> B(data.result))
   .then(data=> {
@@ -59,40 +80,31 @@ app.post('/message', function(req, res) {
 });
 
 let A = (url) => new Promise((resolve, reject)=>{
-  console.log('A Executed');
+  whe=0;
   request({
     url: url,
     method: 'GET'
   }, function(error, response, body) {
-    console.log('error : ', error);
-    jd = JSON.parse(response.body);
-    console.log(jd.results[0]);
-    if(jd.status=='ZERO_RESULTS') whe=-1;
+    if(response.statusCode== 404) whe=-1;
     else{
-      for(var i =0; i<jd.results[0].address_components.length;i++){
-          if(jd.results[0].address_components[i].short_name =='KR'){
-            whe = jd.results[0].geometry.location;
-            calc.mapq(whe.lat,whe.lng);
-            var Xpos = calc.returnX();
-            var Ypos = calc.returnY();
-            console.log(Xpos);
-            console.log(Ypos);
-            wurl = 'http://www.kma.go.kr/wid/queryDFS.jsp?gridx=' + Xpos + '&gridy=' + Ypos;
-            arr[3]=jd.results[0].formatted_address.substring(5,jd.results[0].formatted_address.length)+'\n';
-            break;
-          }
-          else whe=-1;
-      }
+      jd = JSON.parse(response.body);
+      console.log(jd.result); // 로그확인
+      calc.mapq(jd.result.items[0].point.y,jd.result.items[0].point.x);
+      var Xpos = calc.returnX();
+      var Ypos = calc.returnY();
+      arr[3]=jd.result.items[0].address;
+      wurl = 'http://www.kma.go.kr/wid/queryDFS.jsp?gridx=' + Xpos + '&gridy=' +Ypos;
     }
   });
   setTimeout(()=>{
+    console.log('time');
+    console.log(whe);
     if(whe!=-1) resolve({result:wurl});
     else reject({result:new Error("fail")})
-  },1200);
+  },1100);
 });
 
 let B = (wurl)=>new Promise((resolve)=>{
-  console.log('B Executed');
   request({
     url: wurl,
     method: 'GET'
