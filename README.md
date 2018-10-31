@@ -26,5 +26,4 @@ ver 1.1.1
 
 ver 1.2.0  
 맵 API 변경  
-전 [Gdogle Maps Geocoding API](https://developers.google.com/maps/documentation/javascript/geocoding?hl=ko "Google Maps Geocoding API"  
-후 [NAVER Maps API](https://navermaps.github.io/maps.js/docs/index.html)
+전 [Gdogle Maps Geocoding API](https://developers.google.com/maps/documentation/javascript/geocoding?hl=ko "Google Maps Geocoding API") → 후 [NAVER Maps API](https://navermaps.github.io/maps.js/docs/index.html)
